@@ -22,8 +22,8 @@ public class MazeSolverRecursivoCompleto implements MazeSolver {
 
     @Override
     public List<Cell> getPath(boolean[][] grid, Cell start, Cell end) {
-        path.clear();
-        this.path = new ArrayList<>();
+        path = new ArrayList<>();
+        visited = new HashSet<>();
         this.grid = grid;
         this.end = end;
         if (grid == null || grid.length == 0) return path;
@@ -38,21 +38,11 @@ public class MazeSolverRecursivoCompleto implements MazeSolver {
             path.add(current);
             return true;
         }
-        if (findPath(new Cell(current.row+1, current.col))) {
-            path.add(current);
-            return true;
-        }
-        if (findPath(new Cell(current.row, current.col+1))) {
-            path.add(current);
-            return true;
-        }
-        if (findPath(new Cell(current.row-1, current.col))) {
-            path.add(current);
-            return true;
-        }
-        if (findPath(new Cell(current.row, current.col-1))) {
-            path.add(current);
-            return true;
+        for (int[] dir : directions) {            
+            if (findPath(new Cell(current.row + dir[0], current.col + dir[1]))) {
+                path.add(current);
+                return true;
+            }
         }
         return false;
     }
