@@ -17,7 +17,6 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.category.DefaultCategoryDataset;
 
-
 public class ResultadosDialog extends JDialog {
 
     public ResultadosDialog(JFrame parent) {

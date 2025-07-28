@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import models.Cell;
+import models.SolveResults;
 import solver.MazeSolver;
 
 public class MazeSolverBFS implements MazeSolver {
@@ -27,13 +28,13 @@ public class MazeSolverBFS implements MazeSolver {
     }
 
     @Override
-    public List<Cell> getPath(boolean[][] grid, Cell start, Cell end) {
+    public SolveResults getPath(boolean[][] grid, Cell start, Cell end) {
         path = new ArrayList<>();
         parents = new HashMap<>();
         visited = new HashSet<>();
         this.grid = grid;
         this.end = end;
-        if (grid == null || grid.length == 0) return path;
+        if (grid == null || grid.length == 0) return new SolveResults(path, visited);
         Queue<Cell> queue = new LinkedList<>();
         queue.add(start);
         visited.add(start);
@@ -45,11 +46,11 @@ public class MazeSolverBFS implements MazeSolver {
                     path.add(0, current);
                     current = parents.get(current);
                 }
-                return path;
+                return new SolveResults(path, visited);
             }
             findPath(current, queue);
         }
-        return new ArrayList<>();
+        return new SolveResults(new ArrayList<>(), new HashSet<>());
     }
 
     private void findPath(Cell current, Queue<Cell> queue) {

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import models.Cell;
+import models.SolveResults;
 import solver.MazeSolver;
 
 public class MazeSolverRecursivo implements MazeSolver {
@@ -21,14 +22,14 @@ public class MazeSolverRecursivo implements MazeSolver {
     }
 
     @Override
-    public List<Cell> getPath(boolean[][] grid, Cell start, Cell end) {
+    public SolveResults getPath(boolean[][] grid, Cell start, Cell end) {
         path = new ArrayList<>();
         visited = new HashSet<>();
         this.grid = grid;
         this.end = end;
-        if (grid == null || grid.length == 0) return path;
-        if (findPath(start)) return path;
-        return new ArrayList<>();
+        if (grid == null || grid.length == 0) return new SolveResults(path, visited);
+        if (findPath(start)) return new SolveResults(path, visited);
+        return new SolveResults(new ArrayList<>(), new HashSet<>());
     }
 
     private boolean findPath(Cell current) {
