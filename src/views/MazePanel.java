@@ -2,7 +2,10 @@ package views;
 
 import javax.swing.*;
 
+import controllers.MazeController;
+import models.Cell;
 import models.CellState;
+import models.SolveResults;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -10,21 +13,20 @@ import java.awt.event.MouseEvent;
 
 public class MazePanel extends JPanel {
     public enum Mode { SET_START, SET_END, TOGGLE_WALL }
-
+    private MazeController controller;
     private int rows;
     private int cols;
     private Mode currentMode = Mode.TOGGLE_WALL;
-
-    private Point start = null;
-    private Point end = null;
+    private Cell start = null;
+    private Cell end = null;
     private CellState[][] grid;
 
     public MazePanel(int rows, int cols) {
+        controller = new MazeController();
         this.rows = rows;
         this.cols = cols;
-        this.grid = new CellState[cols][rows];
+        this.grid = new CellState[rows][cols];
         initializeGrid();
-
         setBackground(Color.WHITE);
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
@@ -38,86 +40,68 @@ public class MazePanel extends JPanel {
 
     @Override
     public Dimension getPreferredSize() {
-        // Puedes ajustar el tamaño base si quieres, pero no es necesario
         return new Dimension(900, 600);
     }
 
     private void initializeGrid() {
-        for (int x = 0; x < cols; x++) {
-            for (int y = 0; y < rows; y++) {
-                grid[x][y] = CellState.EMPTY;
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                grid[row][col] = CellState.EMPTY;
             }
         }
     }
-
+    
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        int cellw = getWidth() / cols;
+        int cellh = getHeight() / rows;
+        int offsetCol = (getWidth() - (cellw * cols)) / 2;
+        int offsetRow = (getHeight() - (cellh * rows)) / 2;
 
-        // Calcula el tamaño de celda para llenar el panel y que la matriz sea más horizontal
-        int cellWidth = getWidth() / cols;
-        int cellHeight = getHeight() / rows;
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                int drawCol = offsetCol + col * cellw;
+                int drawRow = offsetRow + row * cellh;
 
-        // Centra la matriz si sobra espacio
-        int offsetX = (getWidth() - (cellWidth * cols)) / 2;
-        int offsetY = (getHeight() - (cellHeight * rows)) / 2;
-
-        for (int x = 0; x < cols; x++) {
-            for (int y = 0; y < rows; y++) {
-                int drawX = offsetX + x * cellWidth;
-                int drawY = offsetY + y * cellHeight;
-
-                g.setColor(grid[x][y].getColor());
-                g.fillRect(drawX, drawY, cellWidth, cellHeight);
+                g.setColor(grid[row][col].getColor());
+                g.fillRect(drawCol, drawRow, cellw, cellw);
 
                 g.setColor(Color.LIGHT_GRAY);
-                g.drawRect(drawX, drawY, cellWidth, cellHeight);
+                g.drawRect(drawCol, drawRow, cellw, cellh);
 
-                if (grid[x][y] == CellState.START) {
-                    g.setColor(Color.WHITE);
-                    g.drawString("S", drawX + cellWidth/2 - 3, drawY + cellHeight/2 + 4);
-                } else if (grid[x][y] == CellState.END) {
-                    g.setColor(Color.WHITE);
-                    g.drawString("E", drawX + cellWidth/2 - 3, drawY + cellHeight/2 + 4);
-                }
+                if (grid[row][col] == CellState.START) g.setColor(Color.WHITE);
+                else if (grid[row][col] == CellState.END) g.setColor(Color.WHITE);
             }
         }
     }
-
-    private void handleCellClick(int mouseX, int mouseY) {
-        int cellWidth = getWidth() / cols;
-        int cellHeight = getHeight() / rows;
-        int x = mouseX / cellWidth;
-        int y = mouseY / cellHeight;
-
-        if (x >= cols || y >= rows) return;
-
+    
+    private void handleCellClick(int mouseX, int mouseY) {  
+        int row = mouseY / (getHeight() / rows);
+        int col = mouseX / (getWidth() / cols);
+        if (col >= cols || row >= rows) return;
+        
         switch (currentMode) {
             case SET_START:
-                if (start != null) {
-                    grid[start.x][start.y] = CellState.EMPTY;
-                }
-                start = new Point(x, y);
-                grid[x][y] = CellState.START;
+                if (start != null) grid[start.row][start.col] = CellState.EMPTY;
+                start = new Cell(row, col);
+                grid[row][col] = CellState.START;
                 break;
 
             case SET_END:
-                if (end != null) {
-                    grid[end.x][end.y] = CellState.EMPTY;
-                }
-                end = new Point(x, y);
-                grid[x][y] = CellState.END;
+                if (end != null) grid[end.row][end.col] = CellState.EMPTY;
+                end = new Cell(row, col);
+                grid[row][col] = CellState.END;
                 break;
 
             case TOGGLE_WALL:
-                if (grid[x][y] == CellState.WALL) {
-                    grid[x][y] = CellState.EMPTY;
-                } else if (grid[x][y] == CellState.EMPTY) {
-                    grid[x][y] = CellState.WALL;
+                if (grid[row][col] == CellState.WALL) {
+                    grid[row][col] = CellState.EMPTY;
+                } else if (grid[row][col] == CellState.EMPTY) {
+                    grid[row][col] = CellState.WALL;
                 }
                 break;
         }
-
         repaint();
     }
 
@@ -125,45 +109,20 @@ public class MazePanel extends JPanel {
         this.currentMode = mode;
     }
 
-    public void solveMaze() {
-        if (start == null || end == null) {
-            JOptionPane.showMessageDialog(this, "Debe establecer un punto de inicio y fin", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        for (int y = 0; y < rows; y++) {
-            for (int x = 0; x < cols; x++) {
-                if (grid[x][y] == CellState.PATH) {
-                    grid[x][y] = CellState.EMPTY;
-                }
+    public void solveMaze(String method) {
+        boolean[][] mazeBool = new boolean[rows][cols];
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                mazeBool[row][col] = grid[row][col] != CellState.WALL;
             }
         }
 
-        int currentX = start.x;
-        int currentY = start.y;
-
-        while (currentX != end.x || currentY != end.y) {
-            if (currentX < end.x) currentX++;
-            else if (currentX > end.x) currentX--;
-
-            if (currentY < end.y) currentY++;
-            else if (currentY > end.y) currentY--;
-
-            if (grid[currentX][currentY] == CellState.WALL) {
-                JOptionPane.showMessageDialog(this, "No se puede encontrar un camino (pared en el camino)", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            if (grid[currentX][currentY] == CellState.EMPTY) {
-                grid[currentX][currentY] = CellState.PATH;
-            }
-        }
-
-        repaint();
+        SolveResults solve = controller.obtainRecursiveSolve(mazeBool, start, end);
+        System.out.println(solve.getPath());
     }
 
     public void stepSolve() {
-        solveMaze();
+        //solveMaze();
     }
 
     public void clearMaze() {

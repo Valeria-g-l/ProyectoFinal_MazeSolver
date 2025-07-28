@@ -1,5 +1,6 @@
 package controllers;
 
+import models.Cell;
 import models.SolveResults;
 import solver.solverImpl.MazeSolverBFS;
 import solver.solverImpl.MazeSolverDFS;
@@ -22,8 +23,8 @@ public class MazeController {
         dfs = new MazeSolverDFS();
     }
 
-    //public SolveResults obtainMazeSolve() {
-        
-    //}
+    public SolveResults obtainRecursiveSolve(boolean[][] grid, Cell start, Cell end) {
+        return recursivo.getPath(grid, start, end);
+    }
     
 }

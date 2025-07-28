@@ -6,22 +6,19 @@ import java.awt.event.ActionEvent;
 
 public class MazeFrame extends JFrame {
     private MazePanel mazePanel;
+    JComboBox<String> methods;
     private int rows;
     private int cols;
 
     public MazeFrame(int rows, int cols) {
         this.rows = rows;
         this.cols = cols;
-
         setTitle("MathWorks Maze");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocation(900, 400);
-
         setJMenuBar(createMenuBar());
-
         initUI();
-
-        pack(); // Ajusta el tamaño automáticamente
+        pack();
         setVisible(true);
     }
 
@@ -101,9 +98,9 @@ public class MazeFrame extends JFrame {
         JToolBar bottomToolBar = new JToolBar();
         bottomToolBar.setFloatable(false);
 
-        JComboBox<String> algoCombo = new JComboBox<>(new String[]{"Recursivo", "Backtracking", "Prim's"});
+        methods = new JComboBox<>(new String[]{"Recursivo", "Completo", "Completo BT", "BFS", "DFS"});
         bottomToolBar.add(new JLabel("Algoritmo:"));
-        bottomToolBar.add(algoCombo);
+        bottomToolBar.add(methods);
 
         bottomToolBar.addSeparator();
         bottomToolBar.add(createToolBarButton("Resolver", "Resolver el laberinto"));
@@ -135,7 +132,7 @@ public class MazeFrame extends JFrame {
                 mazePanel.setMode(MazePanel.Mode.TOGGLE_WALL);
                 break;
             case "Resolver":
-                mazePanel.solveMaze();
+                mazePanel.solveMaze(methods.getSelectedItem().toString());
                 break;
             case "Paso a paso":
                 mazePanel.stepSolve();
