@@ -5,11 +5,13 @@ import javax.swing.*;
 import controllers.MazeController;
 import models.Cell;
 import models.CellState;
-import models.SolveResults;
+import models.AlgorithmResult;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Iterator;
+import java.util.Set;
 
 public class MazePanel extends JPanel {
     public enum Mode { SET_START, SET_END, TOGGLE_WALL }
@@ -116,9 +118,58 @@ public class MazePanel extends JPanel {
                 mazeBool[row][col] = grid[row][col] != CellState.WALL;
             }
         }
+        AlgorithmResult solve = null;
+        switch(method) {
+            case "Recursivo":
+                solve = controller.obtainRecursiveSolve(mazeBool, start, end);
+                break;
+            case "Completo":
+                solve = controller.obtainCompleteSolve(mazeBool, start, end);
+                break;
+            case "Completo BT":
+                solve = controller.obtainCompleteBTSolve(mazeBool, start, end);
+                break;
+            case "BFS":
+                solve = controller.obtainBFSSolve(mazeBool, start, end);
+                break;
+            case "DFS":
+                solve = controller.obtainDFSSolve(mazeBool, start, end);
+                break;
+            default:
+                break;
+        }
+        if (solve.getPath().size()>0) setPath(solve);
+        else JOptionPane.showMessageDialog(null, "Camino No Encontrado", "Error", JOptionPane.ERROR_MESSAGE);
+    }
 
-        SolveResults solve = controller.obtainRecursiveSolve(mazeBool, start, end);
-        System.out.println(solve.getPath());
+    private void setPath(AlgorithmResult solve) {
+        int tiempoDeEsperaMs = 200;
+        Iterator<Cell> visited = solve.getVisited().iterator();
+        Timer visitTimer = new Timer(tiempoDeEsperaMs, e -> {
+            if (visited.hasNext()) {
+                Cell c = visited.next();
+                if (grid[c.row][c.col] != CellState.START && grid[c.row][c.col] != CellState.END) {
+                    grid[c.row][c.col] = CellState.VISITED;
+                    repaint();
+                }
+            } else {
+                ((Timer)e.getSource()).stop();
+                Iterator<Cell> path = solve.getPath().iterator();
+                Timer pathTimer = new Timer(tiempoDeEsperaMs, ev -> {
+                    if (path.hasNext()) {
+                        Cell c = path.next();
+                        if (grid[c.row][c.col] != CellState.START && grid[c.row][c.col] != CellState.END) {
+                            grid[c.row][c.col] = CellState.PATH;
+                            repaint();
+                        }
+                    } else {
+                        ((Timer)ev.getSource()).stop();
+                    }
+                });
+                pathTimer.start();
+            }
+        });
+        visitTimer.start();
     }
 
     public void stepSolve() {
@@ -126,9 +177,13 @@ public class MazePanel extends JPanel {
     }
 
     public void clearMaze() {
-        initializeGrid();
-        start = null;
-        end = null;
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                if (grid[row][col] != CellState.START && grid[row][col] != CellState.END && grid[row][col] != CellState.WALL) {
+                    grid[row][col] = CellState.EMPTY;
+                }
+            }
+        }
         repaint();
     }
 }

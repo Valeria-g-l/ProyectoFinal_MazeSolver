@@ -7,8 +7,8 @@ public class CellState {
     public static final CellState WALL = new CellState("Wall", Color.BLACK);
     public static final CellState START = new CellState("Start", Color.GREEN);
     public static final CellState END = new CellState("End", Color.RED);
-    public static final CellState PATH = new CellState("Path", new Color(100, 200, 255));
-    public static final CellState VISITED = new CellState("Visited", new Color(200, 200, 255));
+    public static final CellState PATH = new CellState("Path", Color.BLUE);
+    public static final CellState VISITED = new CellState("Visited", Color.GRAY);
     
     private final String name;
     private final Color color;

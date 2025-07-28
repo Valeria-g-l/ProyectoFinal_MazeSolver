@@ -2,11 +2,12 @@ package solver.solverImpl;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 import models.Cell;
-import models.SolveResults;
+import models.AlgorithmResult;
 import solver.MazeSolver;
 
 public class MazeSolverRecursivoCompletoBT implements MazeSolver {
@@ -18,18 +19,18 @@ public class MazeSolverRecursivoCompletoBT implements MazeSolver {
     public MazeSolverRecursivoCompletoBT() {
         grid = new boolean[][] {};
         path = new ArrayList<>();
-        visited = new HashSet<>();
+        visited = new LinkedHashSet<>();
     }
 
     @Override
-    public SolveResults getPath(boolean[][] grid, Cell start, Cell end) {
+    public AlgorithmResult getPath(boolean[][] grid, Cell start, Cell end) {
         path = new ArrayList<>();
-        visited = new HashSet<>();
+        visited = new LinkedHashSet<>();
         this.grid = grid;
         this.end = end;
-        if (grid == null || grid.length == 0) return new SolveResults(path, visited);
-        if (findPath(start)) return new SolveResults(path, visited);
-        return new SolveResults(new ArrayList<>(), new HashSet<>());
+        if (grid == null || grid.length == 0) return new AlgorithmResult(path, visited);
+        if (findPath(start)) return new AlgorithmResult(path, visited);
+        return new AlgorithmResult(new ArrayList<>(), new LinkedHashSet<>());
     }
 
     private boolean findPath(Cell current) {

@@ -1,7 +1,7 @@
 package controllers;
 
 import models.Cell;
-import models.SolveResults;
+import models.AlgorithmResult;
 import solver.solverImpl.MazeSolverBFS;
 import solver.solverImpl.MazeSolverDFS;
 import solver.solverImpl.MazeSolverRecursivo;
@@ -23,8 +23,23 @@ public class MazeController {
         dfs = new MazeSolverDFS();
     }
 
-    public SolveResults obtainRecursiveSolve(boolean[][] grid, Cell start, Cell end) {
+    public AlgorithmResult obtainRecursiveSolve(boolean[][] grid, Cell start, Cell end) {
         return recursivo.getPath(grid, start, end);
     }
+
+    public AlgorithmResult obtainCompleteSolve(boolean[][] grid, Cell start, Cell end) {
+        return recursivoCompleto.getPath(grid, start, end);
+    }
+
+    public AlgorithmResult obtainCompleteBTSolve(boolean[][] grid, Cell start, Cell end) {
+        return recursivoCompletoBT.getPath(grid, start, end);
+    }
+
+    public AlgorithmResult obtainBFSSolve(boolean[][] grid, Cell start, Cell end) {
+        return bfs.getPath(grid, start, end);
+    }
     
+    public AlgorithmResult obtainDFSSolve(boolean[][] grid, Cell start, Cell end) {
+        return dfs.getPath(grid, start, end);
+    }
 }

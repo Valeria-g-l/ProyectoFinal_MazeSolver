@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import models.Cell;
-import models.SolveResults;
+import models.AlgorithmResult;
 import solver.MazeSolver;
 
 public class MazeSolverDFS implements MazeSolver {
@@ -28,13 +28,13 @@ public class MazeSolverDFS implements MazeSolver {
     }
 
     @Override
-    public SolveResults getPath(boolean[][] grid, Cell start, Cell end) {
+    public AlgorithmResult getPath(boolean[][] grid, Cell start, Cell end) {
         path = new ArrayList<>();
         parents = new HashMap<>();
         visited = new HashSet<>();
         this.grid = grid;
         this.end = end;
-        if (grid == null || grid.length == 0) return new SolveResults(path, visited);
+        if (grid == null || grid.length == 0) return new AlgorithmResult(path, visited);
         Stack<Cell> stack = new Stack<>();
         stack.push(start);
         visited.add(start);
@@ -46,11 +46,11 @@ public class MazeSolverDFS implements MazeSolver {
                     path.add(0, current);
                     current = parents.get(current);
                 }
-                return new SolveResults(stack, visited);
+                return new AlgorithmResult(stack, visited);
             }
             findPath(current, stack);
         }
-        return new SolveResults(new ArrayList<>(), new HashSet<>());
+        return new AlgorithmResult(new ArrayList<>(), new HashSet<>());
     }
 
     private void findPath(Cell current, Stack<Cell> stack) {
