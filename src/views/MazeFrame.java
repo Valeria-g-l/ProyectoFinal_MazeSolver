@@ -33,32 +33,48 @@ public class MazeFrame extends JFrame {
         JMenuItem verResultados = new JMenuItem("Ver resultados");
 
         nuevoLaberinto.addActionListener(e -> {
-        String stringRows = JOptionPane.showInputDialog(this, "Ingrese número de filas:", "Dimensión Maze", JOptionPane.QUESTION_MESSAGE);
-        if (stringRows == null) return;
-        String stringCols = JOptionPane.showInputDialog(this, "Ingrese número de columnas:", "Dimensión Maze", JOptionPane.QUESTION_MESSAGE);
-        if (stringCols == null) return;
-        try {
-            int newRows = Integer.parseInt(stringRows);
-            int newCols = Integer.parseInt(stringCols);
-            if (newRows <= 0 || newCols <= 0) {
-                JOptionPane.showMessageDialog(this, "Las dimensiones deben ser valores positivos", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
+            String stringRows = JOptionPane.showInputDialog(this, "Ingrese número de filas:", "Dimensión Maze", JOptionPane.QUESTION_MESSAGE);
+            if (stringRows == null) return;
+            String stringCols = JOptionPane.showInputDialog(this, "Ingrese número de columnas:", "Dimensión Maze", JOptionPane.QUESTION_MESSAGE);
+            if (stringCols == null) return;
+            try {
+                int newRows = Integer.parseInt(stringRows);
+                int newCols = Integer.parseInt(stringCols);
+                if (newRows <= 0 || newCols <= 0) {
+                    JOptionPane.showMessageDialog(this, "Las dimensiones deben ser valores positivos", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                // Cierra la ventana actual y abre una nueva
+                SwingUtilities.invokeLater(() -> {
+                    dispose();
+                    new MazeFrame(newRows, newCols);
+                });
+            } catch (NumberFormatException err) {
+                JOptionPane.showMessageDialog(this, "Dimensiones no válidas", "Error", JOptionPane.ERROR_MESSAGE);
             }
-            // Cierra la ventana actual y abre una nueva
-            SwingUtilities.invokeLater(() -> {
-                dispose();
-                new MazeFrame(newRows, newCols);
-            });
-        } catch (NumberFormatException err) {
-            JOptionPane.showMessageDialog(this, "Dimensiones no válidas", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    });
-       
+        });
 
-         menuArchivo.add(nuevoLaberinto);
-         menuArchivo.add(verResultados);
+        // Aquí se integra el diálogo de resultados
+        verResultados.addActionListener(e -> {
+            ResultadosDialog dialog = new ResultadosDialog(this);
+            dialog.setVisible(true);
+        });
+
+        menuArchivo.add(nuevoLaberinto);
+        menuArchivo.add(verResultados);
 
         JMenu menuAyuda = new JMenu("Ayuda");
+        JMenuItem acercaDe = new JMenuItem("Acerca de");
+        acercaDe.addActionListener(e -> {
+            // Ventana pequeña centrada sobre la matriz
+            JOptionPane.showMessageDialog(
+                this,
+                "Proyecto Final - Maze Solver\nAutor: Tu Nombre\n2025",
+                "Acerca de",
+                JOptionPane.INFORMATION_MESSAGE
+            );
+        });
+        menuAyuda.add(acercaDe);
 
         menuBar.add(menuArchivo);
         menuBar.add(menuAyuda);
