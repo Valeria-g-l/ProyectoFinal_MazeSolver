@@ -19,55 +19,51 @@ public class MazeSolverDFS implements MazeSolver {
     private Map<Cell, Cell> parents;
     private Set<Cell> visited;
     private Cell end;
-
-    public MazeSolverDFS() {
-        grid = new boolean[][] {};
-        path = new ArrayList<>();
-        parents = new HashMap<>();
-        visited = new HashSet<>();
-    }
+    private final int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 
     @Override
     public AlgorithmResult getPath(boolean[][] grid, Cell start, Cell end) {
-        path = new ArrayList<>();
-        parents = new HashMap<>();
-        visited = new HashSet<>();
         this.grid = grid;
+        this.path = new ArrayList<>();
+        this.parents = new HashMap<>();
+        this.visited = new HashSet<>();
         this.end = end;
-        if (grid == null || grid.length == 0) return new AlgorithmResult(path, visited);
+        if (grid == null || grid.length == 0 || !isInMaze(start) || !isInMaze(end)) {
+            return new AlgorithmResult(new ArrayList<>(), new HashSet<>());
+        }
         Stack<Cell> stack = new Stack<>();
         stack.push(start);
         visited.add(start);
         parents.put(start, null);
+
         while (!stack.isEmpty()) {
             Cell current = stack.pop();
             if (current.equals(end)) {
-                while (current != null) {
-                    path.add(0, current);
-                    current = parents.get(current);
+                Cell node = end;
+                while (node != null) {
+                    path.add(0, node);
+                    node = parents.get(node);
                 }
-                return new AlgorithmResult(stack, visited);
+                return new AlgorithmResult(path, visited);
             }
-            findPath(current, stack);
-        }
-        return new AlgorithmResult(new ArrayList<>(), new HashSet<>());
-    }
-
-    private void findPath(Cell current, Stack<Cell> stack) {
-        for (int[] dir : directions) {
-            Cell nextCell = new Cell(current.row + dir[0], current.col + dir[1]);
-            if (isInMaze(nextCell) && isValid(nextCell)) {
-                visited.add(nextCell);
-                parents.put(nextCell, current);
-                stack.push(current);
+            for (int[] dir : directions) {
+                Cell nextCell = new Cell(current.row + dir[0], current.col + dir[1]);
+                if (isInMaze(nextCell) && isValid(nextCell)) {
+                    visited.add(nextCell);
+                    parents.put(nextCell, current);
+                    stack.push(nextCell);
+                }
             }
         }
+        return new AlgorithmResult(new ArrayList<>(), visited);
     }
 
     private boolean isInMaze(Cell current) {
-        int row = current.row;
-        int col = current.col;
-        return row<grid.length && col<grid[0].length;
+        return current != null && 
+               current.row >= 0 && 
+               current.col >= 0 && 
+               current.row < grid.length && 
+               current.col < grid[0].length;
     }
     
     private boolean isValid(Cell current) {

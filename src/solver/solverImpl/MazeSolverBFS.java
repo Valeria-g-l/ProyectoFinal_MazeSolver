@@ -51,7 +51,7 @@ public class MazeSolverBFS implements MazeSolver {
             }
             findPath(current, queue);
         }
-        return new AlgorithmResult(new ArrayList<>(), new LinkedHashSet<>());
+        return new AlgorithmResult(new ArrayList<>(), visited);
     }
 
     private void findPath(Cell current, Queue<Cell> queue) {
@@ -66,9 +66,11 @@ public class MazeSolverBFS implements MazeSolver {
     }
 
     private boolean isInMaze(Cell current) {
-        int row = current.row;
-        int col = current.col;
-        return row<grid.length && col<grid[0].length;
+        return current != null && 
+               current.row >= 0 && 
+               current.col >= 0 && 
+               current.row < grid.length && 
+               current.col < grid[0].length;
     }
     
     private boolean isValid(Cell current) {

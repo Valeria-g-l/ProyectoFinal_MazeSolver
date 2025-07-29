@@ -18,7 +18,7 @@ public class MazePanel extends JPanel {
     private MazeController controller;
     private int rows;
     private int cols;
-    private Mode currentMode = Mode.TOGGLE_WALL;
+    private Mode currentMode = Mode.SET_START;
     private Cell start = null;
     private Cell end = null;
     private CellState[][] grid;
@@ -138,8 +138,7 @@ public class MazePanel extends JPanel {
             default:
                 break;
         }
-        if (solve.getPath().size()>0) setPath(solve);
-        else JOptionPane.showMessageDialog(null, "Camino No Encontrado", "Error", JOptionPane.ERROR_MESSAGE);
+        setPath(solve);
     }
 
     private void setPath(AlgorithmResult solve) {
@@ -154,6 +153,10 @@ public class MazePanel extends JPanel {
                 }
             } else {
                 ((Timer)e.getSource()).stop();
+                if (solve.getPath().isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Camino No Encontrado", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
                 Iterator<Cell> path = solve.getPath().iterator();
                 Timer pathTimer = new Timer(tiempoDeEsperaMs, ev -> {
                     if (path.hasNext()) {
@@ -163,7 +166,7 @@ public class MazePanel extends JPanel {
                             repaint();
                         }
                     } else {
-                        ((Timer)ev.getSource()).stop();
+                        ((Timer) ev.getSource()).stop();
                     }
                 });
                 pathTimer.start();

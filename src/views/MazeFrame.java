@@ -3,6 +3,7 @@ package views;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class MazeFrame extends JFrame {
     private MazePanel mazePanel;
@@ -15,7 +16,7 @@ public class MazeFrame extends JFrame {
         this.cols = cols;
         setTitle("MathWorks Maze");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocation(900, 400);
+        setLocation(0, 0);
         setJMenuBar(createMenuBar());
         initUI();
         pack();
@@ -41,7 +42,6 @@ public class MazeFrame extends JFrame {
                     JOptionPane.showMessageDialog(this, "Las dimensiones deben ser valores positivos", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                // Cierra la ventana actual y abre una nueva
                 SwingUtilities.invokeLater(() -> {
                     dispose();
                     new MazeFrame(newRows, newCols);
@@ -50,8 +50,6 @@ public class MazeFrame extends JFrame {
                 JOptionPane.showMessageDialog(this, "Dimensiones no válidas", "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
-
-        // Aquí se integra el diálogo de resultados
         verResultados.addActionListener(e -> {
             ResultadosDialog dialog = new ResultadosDialog(this);
             dialog.setVisible(true);
@@ -63,7 +61,6 @@ public class MazeFrame extends JFrame {
         JMenu menuAyuda = new JMenu("Ayuda");
         JMenuItem acercaDe = new JMenuItem("Acerca de");
         acercaDe.addActionListener(e -> {
-            // Ventana pequeña centrada sobre la matriz
             JOptionPane.showMessageDialog(
                 this,
                 "Proyecto Final - Maze Solver\nAutor: Tu Nombre\n2025",
@@ -85,13 +82,12 @@ public class MazeFrame extends JFrame {
         JToolBar topToolBar = new JToolBar();
         topToolBar.setFloatable(false);
 
-        topToolBar.add(createToolBarButton("Set Start", "Establecer punto de inicio"));
-        topToolBar.add(createToolBarButton("Set End", "Establecer punto final"));
-        topToolBar.add(createToolBarButton("Toggle Wall", "Alternar pared"));
+        topToolBar.add(createModeButton("Set Start"));
+        topToolBar.add(createModeButton("Set End"));
+        topToolBar.add(createModeButton("Toggle Wall"));
 
         mainPanel.add(topToolBar, BorderLayout.NORTH);
 
-        // Panel del laberinto
         mazePanel = new MazePanel(rows, cols);
         mainPanel.add(mazePanel, BorderLayout.CENTER);
 
@@ -103,43 +99,66 @@ public class MazeFrame extends JFrame {
         bottomToolBar.add(methods);
 
         bottomToolBar.addSeparator();
-        bottomToolBar.add(createToolBarButton("Resolver", "Resolver el laberinto"));
-        bottomToolBar.add(createToolBarButton("Paso a paso", "Resolver paso a paso"));
-        bottomToolBar.add(createToolBarButton("Limpiar", "Limpiar laberinto"));
+        bottomToolBar.add(createMazeButton("Resolver"));
+        bottomToolBar.add(createMazeButton("Paso a paso"));
+        bottomToolBar.add(createMazeButton("Limpiar"));
 
         mainPanel.add(bottomToolBar, BorderLayout.SOUTH);
-
         add(mainPanel);
     }
 
-    private JButton createToolBarButton(String text, String tooltip) {
+    private JButton createModeButton(String text) {
         JButton button = new JButton(text);
-        button.setToolTipText(tooltip);
-        button.addActionListener(this::handleButtonClick);
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String command = ((JButton)e.getSource()).getText();
+                switch (command) {
+                    case "Set Start":
+                        mazePanel.setMode(MazePanel.Mode.SET_START);
+                        break;
+                    case "Set End":
+                        mazePanel.setMode(MazePanel.Mode.SET_END);
+                        break;
+                    case "Toggle Wall":
+                        mazePanel.setMode(MazePanel.Mode.TOGGLE_WALL);
+                        break;
+                }
+            }
+        });
         return button;
     }
 
-    private void handleButtonClick(ActionEvent e) {
-        String command = ((JButton)e.getSource()).getText();
-        switch (command) {
-            case "Set Start":
-                mazePanel.setMode(MazePanel.Mode.SET_START);
-                break;
-            case "Set End":
-                mazePanel.setMode(MazePanel.Mode.SET_END);
-                break;
-            case "Toggle Wall":
-                mazePanel.setMode(MazePanel.Mode.TOGGLE_WALL);
-                break;
-            case "Resolver":
-                mazePanel.solveMaze(methods.getSelectedItem().toString());
-                break;
-            case "Paso a paso":
-                mazePanel.stepSolve();
-                break;
-            case "Limpiar":
-                mazePanel.clearMaze();
-                break;
-        }
+    private JButton createMazeButton(String text) {
+        JButton button = new JButton(text);
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String command = ((JButton)e.getSource()).getText();
+                switch (command) {
+                    case "Set Start":
+                        mazePanel.setMode(MazePanel.Mode.SET_START);
+                        break;
+                    case "Set End":
+                        mazePanel.setMode(MazePanel.Mode.SET_END);
+                        break;
+                    case "Toggle Wall":
+                        mazePanel.setMode(MazePanel.Mode.TOGGLE_WALL);
+                        break;
+                    case "Resolver":
+                        mazePanel.solveMaze(methods.getSelectedItem().toString());
+                        break;
+                    case "Paso a paso":
+                        mazePanel.stepSolve();
+                        break;
+                    case "Limpiar":
+                        mazePanel.clearMaze();
+                        break;
+                }
+            }
+        });
+        return button;
     }
+
+
 }
