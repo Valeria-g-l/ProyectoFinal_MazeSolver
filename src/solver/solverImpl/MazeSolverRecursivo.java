@@ -33,7 +33,7 @@ public class MazeSolverRecursivo implements MazeSolver {
         return new AlgorithmResult(new ArrayList<>(), visited);
     }
 
-    private boolean findPath(Cell current) {
+    private boolean findPath(Cell current){
         if (!isInMaze(current) || !grid[current.row][current.col]) return false;
         visited.add(current);
         if (current.equals(end)) {
@@ -57,5 +57,6 @@ public class MazeSolverRecursivo implements MazeSolver {
                current.row < grid.length && 
                current.col < grid[0].length;
     }
-    
-}
+
+    }
+
